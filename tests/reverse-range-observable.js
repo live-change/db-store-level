@@ -29,11 +29,18 @@ test("store range observable", t => {
   })
 
   let nextValueResolve
-  const getNextValue = () => new Promise((resolve, reject) => nextValueResolve = resolve)
-
+  let gotNextValue
+  const getNextValue = () => {
+    if(gotNextValue) {
+      gotNextValue = false
+      return rangeObservable.list
+    }
+    return new Promise((resolve, reject) => nextValueResolve = resolve)
+  }
   let rangeObservable
   const rangeObserver = (signal, value, ...rest) => {
     console.log("SIGNAL", signal, value, ...rest)
+    gotNextValue = true
     if(nextValueResolve) nextValueResolve(rangeObservable.list)
   }
 
@@ -46,28 +53,28 @@ test("store range observable", t => {
 
     t.test("remove object 'a' from observed range", async t => {
       t.plan(1)
-      store.delete('a')
+      await store.delete('a')
       let values = await getNextValue()
       t.deepEqual(values, [ { v: 3, id: 'c' } ], 'range value' )
     })
 
     t.test("add object 'a' to observed range", async t => {
       t.plan(1)
-      store.put({ id: 'a', v: 4 })
+      await store.put({ id: 'a', v: 4 })
       let values = await getNextValue()
       t.deepEqual(values, [ { v: 3, id: 'c' }, { v: 4, id: 'a' } ], 'range value' )
     })
 
     t.test("add object 'b' to observed range", async t => {
       t.plan(1)
-      store.put({ id: 'b', v: 5 })
+      await store.put({ id: 'b', v: 5 })
       let values = await getNextValue()
       t.deepEqual(values, [ { v: 3, id: 'c' }, { v: 5, id: 'b' }, { v: 4, id: 'a' } ], 'range value' )
     })
 
     t.test("add object 'd' to observed range", async t => {
       t.plan(1)
-      store.put({ id: 'd', v: 6 })
+      await store.put({ id: 'd', v: 6 })
       let values = await getNextValue()
       t.deepEqual(values, [ { v: 6, id: 'd' }, { v: 3, id: 'c' }, { v: 5, id: 'b' }, { v: 4, id: 'a' } ], 'range value' )
     })
@@ -100,14 +107,14 @@ test("store range observable", t => {
 
     t.test("add object 'ab' to observed range", async t => {
       t.plan(1)
-      store.put({ id: 'ab', v: 7 })
+      await store.put({ id: 'ab', v: 7 })
       let values = await getNextValue()
       t.deepEqual(values, [ { v: 3, id: 'c' }, { v: 5, id: 'b' }, { v: 7, id: 'ab' } ], 'range value' )
     })
 
     t.test("remove object 'ab' from observed range", async t => {
       t.plan(1)
-      store.delete('ab')
+      await store.delete('ab')
       let values = await getNextValue()
       t.deepEqual(values, [ { v: 3, id: 'c' }, { v: 5, id: 'b' } ], 'range value' )
     })

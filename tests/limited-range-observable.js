@@ -29,18 +29,25 @@ test("store range observable", t => {
     for(let i = 0; i < 10; i++) {
       let obj = { id: 'b_' + i, v: i  }
       objects.push(obj)
-      store.put(obj)
+      await store.put(obj)
     }
-    store.put({ id: 'c_0', v: 1  })
+    await store.put({ id: 'c_0', v: 1  })
     t.pass('objects written')
   })
 
   let nextValueResolve
-  const getNextValue = () => new Promise((resolve, reject) => nextValueResolve = resolve)
-
+  let gotNextValue
+  const getNextValue = () => {
+    if(gotNextValue) {
+      gotNextValue = false
+      return rangeObservable.list
+    }
+    return new Promise((resolve, reject) => nextValueResolve = resolve)
+  }
   let rangeObservable
   const rangeObserver = (signal, value, ...rest) => {
     console.log("SIGNAL", signal, value, ...rest)
+    gotNextValue = true
     if(nextValueResolve) nextValueResolve(rangeObservable.list)
   }
 
@@ -53,7 +60,7 @@ test("store range observable", t => {
 
     t.test("remove object 'b_3' from observed range", async t => {
       t.plan(1)
-      store.delete('b_3')
+      await store.delete('b_3')
       objects.splice(3, 1)
       await getNextValue() // one shorter
       let values = await getNextValue()
@@ -63,7 +70,7 @@ test("store range observable", t => {
     t.test("add object 'b_3' to observed range", async t => {
       t.plan(1)
       const obj = { id: 'b_3', v: 10 }
-      store.put(obj)
+      await store.put(obj)
       objects.splice(3, 0, obj)
       let values = await getNextValue()
       t.deepEqual(values, objects.slice(0, 5), 'range value' )
@@ -72,7 +79,7 @@ test("store range observable", t => {
     t.test("add object 'b_32' to observed range", async t => {
       t.plan(1)
       const obj = { id: 'b_32', v: 11 }
-      store.put(obj)
+      await store.put(obj)
       objects.splice(4, 0, obj)
       let values = await getNextValue()
       t.deepEqual(values, objects.slice(0, 5), 'range value' )
@@ -88,7 +95,7 @@ test("store range observable", t => {
 
     t.test("delete object 'b_32' so b_35 will enter into range limits", async t => {
       t.plan(1)
-      store.delete('b_32')
+      await store.delete('b_32')
       objects.splice(4, 1)
       await getNextValue()
       let values = await getNextValue()
@@ -104,6 +111,7 @@ test("store range observable", t => {
 
   t.test("observe range (b_0,b_5)", async t => {
     t.plan(7)
+    gotNextValue = false
     rangeObservable = store.rangeObservable({ gt: 'b_0', lt: 'b_5', limit: 3 })
     rangeObservable.observe(rangeObserver)
     let values = await getNextValue()
@@ -130,7 +138,7 @@ test("store range observable", t => {
     t.test("add object 'b_12' to observed range", async t => {
       t.plan(1)
       const obj = { id: 'b_12', v: 7 }
-      store.put(obj)
+      await store.put(obj)
       objects.splice(2, 0, obj)
       let values = await getNextValue()
       t.deepEqual(values, objects.slice(1,4), 'range value' )
@@ -138,7 +146,7 @@ test("store range observable", t => {
 
     t.test("remove object 'b_12' from observed range", async t => {
       t.plan(1)
-      store.delete('b_12')
+      await store.delete('b_12')
       objects.splice(2, 1)
       await getNextValue()
       let values = await getNextValue()

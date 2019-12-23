@@ -22,11 +22,19 @@ test("store object observable", t => {
   })
 
   let nextValueResolve
-  const getNextValue = () => new Promise((resolve, reject) => nextValueResolve = resolve)
+  let gotNextValue
+  const getNextValue = () => {
+    if(gotNextValue) {
+      gotNextValue = false
+      return objectObservable.value
+    }
+    return new Promise((resolve, reject) => nextValueResolve = resolve)
+  }
 
   let objectObservable
   const objectObserver = (signal, value, ...rest) => {
     console.log("SIGNAL", signal, value, ...rest)
+    gotNextValue = true
     if(nextValueResolve) nextValueResolve(value)
   }
 
@@ -39,14 +47,14 @@ test("store object observable", t => {
 
     t.test("add object A", async t => {
       t.plan(1)
-      store.put({ id: 'A', a: 1 })
+      await store.put({ id: 'A', a: 1 })
       let value = await getNextValue()
       t.deepEqual(value, { id: 'A', a: 1 } , 'found object' )
     })
 
     t.test("delete object A", async t => {
       t.plan(1)
-      store.delete('A')
+      await store.delete('A')
       let value = await getNextValue()
       t.deepEqual(value, null , 'found null' )
     })
