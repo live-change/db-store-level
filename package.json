@@ -1,5 +1,5 @@
 {
-  "name": "@live-change/db",
+  "name": "@live-change/db-store-level",
   "version": "0.1.2",
   "description": "Database with observable data for live queries",
   "main": "index.js",
