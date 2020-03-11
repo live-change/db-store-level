@@ -4,7 +4,7 @@ const leveldown = require('leveldown')
 const encoding = require('encoding-down')
 const rimraf = require("rimraf")
 
-const StoreNonReactive = require('../lib/Store.js')
+const Store = require('../lib/Store.js')
 
 const dbPath = `./test.ro.db`
 rimraf.sync(dbPath)
@@ -17,7 +17,7 @@ test("store range observable", t => {
 
   t.test("create store", async t => {
     t.plan(1)
-    store = new StoreNonReactive(level)
+    store = new Store(level)
     t.pass('store created')
   })
 
@@ -54,9 +54,7 @@ test("store range observable", t => {
     t.test("remove object 'a' from observed range", async t => {
       t.plan(1)
       await store.delete('a')
-      console.log("DEL!")
       let values = await getNextValue()
-      console.log("WTF?")
       t.deepEqual(values, [ { v: 3, id: 'c' } ], 'range value' )
     })
 

@@ -4,7 +4,7 @@ const leveldown = require('leveldown')
 const encoding = require('encoding-down')
 const rimraf = require("rimraf")
 
-const StoreNonReactive = require('../lib/Store.js')
+const Store = require('../lib/Store.js')
 
 const dbPath = `./test.lrro.db`
 rimraf.sync(dbPath)
@@ -17,7 +17,7 @@ test("store range observable", t => {
 
   t.test("create store", async t => {
     t.plan(1)
-    store = new StoreNonReactive(level)
+    store = new Store(level)
     t.pass('store created')
   })
 

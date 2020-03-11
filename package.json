@@ -1,6 +1,6 @@
 {
   "name": "@live-change/db-store-level",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Database with observable data for live queries",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/live-change/db.git"
+    "url": "git+https://github.com/live-change/db-store-level.git"
   },
   "author": {
     "email": "m8@em8.pl",
@@ -17,9 +17,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/live-change/db/issues"
+    "url": "https://github.com/live-change/db-store-level/issues"
   },
-  "homepage": "https://github.com/live-change/db",
+  "homepage": "https://github.com/live-change/db-store-level",
   "devDependencies": {
     "rimraf": "^3.0.0",
     "tape": "^4.11.0",
