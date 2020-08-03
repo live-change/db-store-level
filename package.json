@@ -32,6 +32,6 @@
   },
   "dependencies": {
     "@live-change/dao": "^0.2.3",
-    "node-interval-tree": "^1.3.3"
+    "@live-change/interval-tree": "^1.0.12"
   }
 }
